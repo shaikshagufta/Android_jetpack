@@ -20,16 +20,4 @@ class ListFragment : Fragment() {
        binding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.buttonDetails.setOnClickListener {
-            val action = ListFragmentDirections.actionDetailFragment()
-            //to use the action we created in the dog_navigation: dogUuid
-            // ie, passing the argument in list fragment to retrieve from detail fragment
-            action.dogUuid = 5
-            Navigation.findNavController(it).navigate(action)
-        }
-    }
 }

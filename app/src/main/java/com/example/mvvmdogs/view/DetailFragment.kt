@@ -29,14 +29,6 @@ class DetailFragment : Fragment() {
         //retrieving the argument we passed in list-fragment to detail-fragment if its not null
         arguments?.let {
             dogUuid = DetailFragmentArgs.fromBundle(it).dogUuid
-            //assigning the value to textView for testing
-            binding.textView2.text = dogUuid.toString()
-        }
-
-        //setting onclick listener to the fab
-        binding.buttonList.setOnClickListener {
-            val action = DetailFragmentDirections.actionListFragment()
-            Navigation.findNavController(it).navigate(action)
         }
     }
 }
