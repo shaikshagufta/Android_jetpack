@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mvvmdogs.R
 import com.example.mvvmdogs.databinding.ItemDogBinding
@@ -13,13 +14,6 @@ import com.example.mvvmdogs.model.DogBreed
 class DogsListAdapter(val dogList: ArrayList<DogBreed>) : RecyclerView.Adapter<DogsListAdapter.DogViewHolder>(){
 
     lateinit var binding: ItemDogBinding
-
-    //inner class we created before inheritance
-    inner class DogViewHolder(var view: View) : RecyclerView.ViewHolder(view){
-
-        val name = view.findViewById<TextView>(R.id.name)
-        val lifeSpan = view.findViewById<TextView>(R.id.lifeSpan)
-    }
 
     //to update the list when we get info from backend
     fun updateDogList(newDogList: List<DogBreed>) {
@@ -41,9 +35,20 @@ class DogsListAdapter(val dogList: ArrayList<DogBreed>) : RecyclerView.Adapter<D
     //binding the element of the dogList with position to the vieHolder
     override fun onBindViewHolder(holder: DogViewHolder, position: Int) {
 
-        holder.name.text = dogList.get(position).dogBreed
+        holder.name.text= dogList.get(position).dogBreed
         holder.lifeSpan.text = dogList.get(position).lifeSpan
+        //nav to detail fragment on click
+        holder.view.setOnClickListener {
+            Navigation.findNavController(it).navigate(ListFragmentDirections.actionDetailFragment())
+        }
     }
 
     override fun getItemCount() = dogList.size
+
+    //inner class we created before inheritance
+    inner class DogViewHolder(var view: View) : RecyclerView.ViewHolder(view){
+
+        val name = view.findViewById<TextView>(R.id.name)
+        val lifeSpan = view.findViewById<TextView>(R.id.lifeSpan)
+    }
 }

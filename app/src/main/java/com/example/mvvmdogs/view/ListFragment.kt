@@ -33,7 +33,8 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //instantiating ViewModel
-        // we use viewModelP to prevent loosing state of the data when the screen is rotated or when app is run in background, without needing to handle the state management
+        // we use viewModelP to prevent loosing state of the data when the screen is rotated
+        // or when app is run in background, without needing to handle the state management
         viewModel = ViewModelProvider(this).get(ListViewModel::class.java)
         viewModel.refresh()//generates dog objects and a dogList and update the variables in the ListFragment
 
