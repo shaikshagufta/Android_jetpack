@@ -46,7 +46,7 @@ def retrofitVersion = '2.9.0'
 def roomVersion = '2.4.2'
 def navVersion = '2.5.0-alpha04'
 def glideVersion = '4.13.1'
-def rxJavaVersion = '3.1.4'
+def rxJavaVersion = '2.1.1'
 def preferenceVersion = '1.2.0'
 
 
@@ -72,8 +72,8 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
 
-    implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
-    implementation "io.reactivex.rxjava3:rxandroid:3.0.0"
+    implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxJavaVersion"
 
     implementation "com.github.bumptech.glide:glide:$glideVersion"
     kapt "com.github.bumptech.glide:compiler:$glideVersion"

@@ -1,13 +1,12 @@
 package com.example.mvvmdogs.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mvvmdogs.databinding.FragmentListBinding
 import com.example.mvvmdogs.viewmodel.ListViewModel
@@ -41,6 +40,16 @@ class ListFragment : Fragment() {
             layoutManager= LinearLayoutManager(context)//can also be a GridLayoutManager
             adapter = dogsListAdapter
         }
+
+        //functionality to refresh the details
+        binding.refreshLayout.setOnRefreshListener {
+            binding.dogsList.visibility = View.GONE
+            binding.listError.visibility = View.GONE
+            binding.loadingView.visibility = View.VISIBLE
+            viewModel.refresh()
+            binding.refreshLayout.isRefreshing = false
+        }
+
         //to observe the ViewModel using the values declared in the ListViewModel
         observeViewModel()
     }

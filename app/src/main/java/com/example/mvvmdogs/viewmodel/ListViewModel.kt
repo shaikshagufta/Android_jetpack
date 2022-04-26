@@ -3,8 +3,18 @@ package com.example.mvvmdogs.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mvvmdogs.model.DogBreed
+import com.example.mvvmdogs.model.DogsApiService
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 
 class ListViewModel: ViewModel() {
+
+    private val dogsService = DogsApiService()
+    //allows us to observe the observable(Single) without having to worry about disposing it,
+    // to avoid memory leaks due to observing or waiting for an Observable(Single) when the app is destroyed
+    private val disposable = CompositeDisposable()
 
     //provides livedata to the actual List<DogBreed> from the data source
     val dogs = MutableLiveData<List<DogBreed>>()
@@ -13,16 +23,47 @@ class ListViewModel: ViewModel() {
     //another livedata which will notify to the listeners of ViewModel if the data is loading (with no error)
     val loading = MutableLiveData<Boolean>()
 
-    //method
     fun refresh() {
-        val dog1 = DogBreed("1", "Corgi","15 years","breedGroup", "bredFor", "temperament", "")
-        val dog2 = DogBreed("2", "Labrador","10 years","breedGroup", "bredFor", "temperament", "")
-        val dog3 = DogBreed("3", "Rotwailer","20 years","breedGroup", "bredFor", "temperament", "")
-        val dogList:ArrayList<DogBreed> = arrayListOf<DogBreed>(dog1,dog2,dog3)
+        fetchFromRemote()
+    }
 
-        dogs.value = dogList
-        dogsLoadError.value = false
-        loading.value = false
+    //uses Retrofit Service to retrieve data from backEnd Api
+    private fun fetchFromRemote() {
+        loading.value = true
+        disposable.add(
+            //returns us the Single(Observable)
+            dogsService.getDogs()
+            //we want this call to be made on a separate thread instead of the main thread
+            //because if we don't the app will be blocked till the api is returned/retrieved
+            // android apps crash in such a case
+            //we avoid such behaviour by passing this call to endPoint on a background Thread follows
+                .subscribeOn(Schedulers.newThread())
+            //to display it we need it back on Main Thread instead on BackgroundThread
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object: DisposableSingleObserver<List<DogBreed>>() {
+                    // we update our MutableLiveData
+                    override fun onSuccess(dogList: List<DogBreed>) {
+                        //get the list the dogBreed when success
+                        dogs.value = dogList
+                        dogsLoadError.value = false
+                        loading.value = false
+                    }
 
+                    override fun onError(e: Throwable) {
+                        //get an error msg when error
+                        dogsLoadError.value = true
+                        loading.value = false
+                        e.printStackTrace()//to have a trace of the info that's being displayed in logs
+                    }
+
+                })
+        )
+    }
+
+    // to avoid memory leaks due to observing or waiting for an Observable(Single) when the app is destroyed
+    override fun onCleared() {
+        super.onCleared()
+        disposable.clear()//to clean up
     }
 }
+
