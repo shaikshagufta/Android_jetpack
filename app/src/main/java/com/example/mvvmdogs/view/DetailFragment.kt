@@ -32,8 +32,6 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //instantiating DetailViewModel
-        // we use viewModelP to prevent loosing state of the data when the screen is rotated
-        // or when app is run in background, without needing to handle the state management
         viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
         viewModel.fetch()
 
