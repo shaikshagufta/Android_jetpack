@@ -3,12 +3,15 @@ package com.example.mvvmdogs.view
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mvvmdogs.R
 import com.example.mvvmdogs.databinding.ItemDogBinding
 import com.example.mvvmdogs.model.DogBreed
+import com.example.mvvmdogs.util.getProgressDrawable
+import com.example.mvvmdogs.util.loadImage
 
 
 class DogsListAdapter(val dogList: ArrayList<DogBreed>) : RecyclerView.Adapter<DogsListAdapter.DogViewHolder>(){
@@ -41,6 +44,7 @@ class DogsListAdapter(val dogList: ArrayList<DogBreed>) : RecyclerView.Adapter<D
         holder.view.setOnClickListener {
             Navigation.findNavController(it).navigate(ListFragmentDirections.actionDetailFragment())
         }
+        holder.imageView.loadImage(dogList[position].imageUrl, getProgressDrawable(holder.imageView.context))
     }
 
     override fun getItemCount() = dogList.size
@@ -50,5 +54,6 @@ class DogsListAdapter(val dogList: ArrayList<DogBreed>) : RecyclerView.Adapter<D
 
         val name = view.findViewById<TextView>(R.id.name)
         val lifeSpan = view.findViewById<TextView>(R.id.lifeSpan)
+        val imageView = view.findViewById<ImageView>(R.id.imageView)
     }
 }
