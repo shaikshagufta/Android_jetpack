@@ -33,12 +33,9 @@ class ListViewModel: ViewModel() {
         disposable.add(
             //returns us the Single(Observable)
             dogsService.getDogs()
-            //we want this call to be made on a separate thread instead of the main thread
-            //because if we don't the app will be blocked till the api is returned/retrieved
-            // android apps crash in such a case
-            //we avoid such behaviour by passing this call to endPoint on a background Thread follows
+                //using a new bg thread for retrieving info
                 .subscribeOn(Schedulers.newThread())
-            //to display it we need it back on Main Thread instead on BackgroundThread
+                //to display it we need it back on Main Thread instead on BackgroundThread
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object: DisposableSingleObserver<List<DogBreed>>() {
                     // we update our MutableLiveData
@@ -53,9 +50,9 @@ class ListViewModel: ViewModel() {
                         //get an error msg when error
                         dogsLoadError.value = true
                         loading.value = false
-                        e.printStackTrace()//to have a trace of the info that's being displayed in logs
+                        //to have a trace of the info that's being displayed in logs
+                        e.printStackTrace()
                     }
-
                 })
         )
     }

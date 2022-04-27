@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class DogBreed(
     @SerializedName("id")
-    val breedId: String?,//will get the value from "id" from BackEnd-API
+    val breedId: String?,
 
     @SerializedName("name")
     val dogBreed: String?,

@@ -14,11 +14,15 @@ class DogsApiService {
     private val api = Retrofit.Builder()
         .baseUrl(BASE_URL)
             //Converting the Gson to a Single
-        .addConverterFactory(GsonConverterFactory.create())//google Library// converts the Json file in the api into our dataModel class format
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())//converts the list of the objects in the dataModel class to an observable(Single)
-            //Single- Observable that emits data once and finishes
+
+        //google Library// converts the Json file in the api into our dataModel class format
+        .addConverterFactory(GsonConverterFactory.create())
+        //converts the list of the objects in the dataModel class to an observable(Single)
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            //I- Single- Observable that emits data once and finishes
         .build()
-        .create(DogsApi::class.java)//build based on the DogsApi Interface i.e, methods defined in it
+        //build based on the DogsApi Interface i.e, methods defined in it
+        .create(DogsApi::class.java)
 
     //methods to return the data required from each method call in the Interface
     fun getDogs() : Single<List<DogBreed>> {//observable that returns the info from the backend
