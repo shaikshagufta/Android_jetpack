@@ -44,6 +44,12 @@ class ListViewModel: ViewModel() {
                         dogs.value = dogList
                         dogsLoadError.value = false
                         loading.value = false
+                        /*
+                        we need to store this data in a db with the time of retrieval
+                        we also set the lifetime of that stored data so that
+                        if we retrieve the data before that lifetime again we can get it from the db(storage)
+                        otherwise from the remote Api
+                        */
                     }
 
                     override fun onError(e: Throwable) {
