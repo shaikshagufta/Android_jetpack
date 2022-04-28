@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.mvvmdogs.model.DogBreed
 import com.example.mvvmdogs.model.DogDatabase
 import com.example.mvvmdogs.model.DogsApiService
+import com.example.mvvmdogs.util.SharedPreferencesHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
@@ -17,6 +18,8 @@ import kotlinx.coroutines.launch
     implement some coroutines in a baseClass(BaseViewModel) and extend the ListViewModel from that base class
 */
 class ListViewModel(application: Application): BaseViewModel(application) {
+
+    private var prefHelper = SharedPreferencesHelper(getApplication())
 
     private val dogsService = DogsApiService()
     //allows us to observe the observable(Single) without having to worry about disposing it,
@@ -72,6 +75,8 @@ class ListViewModel(application: Application): BaseViewModel(application) {
     we also set the lifetime of that stored data so that
     if we retrieve the data before that lifetime again we can get it from the db(storage)
     otherwise from the remote Api
+    (this time Of Retrieval can be stored locally using Shared Prefs)
+
     then update the UI
     */
 
@@ -104,6 +109,8 @@ class ListViewModel(application: Application): BaseViewModel(application) {
             }
             dogsRetrieved(list)
         }
+        //stores the time accurate to nano seconds when we have updated the database with  the dog info that was retrieved
+        prefHelper.saveUpdateTime(System.nanoTime())
     }
 
     // to avoid memory leaks due to observing or waiting for an Observable(Single) when the app is destroyed
