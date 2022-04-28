@@ -1,6 +1,7 @@
 package com.example.mvvmdogs.viewmodel
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.example.mvvmdogs.model.DogBreed
 import com.example.mvvmdogs.model.DogDatabase
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 class ListViewModel(application: Application): BaseViewModel(application) {
 
     private var prefHelper = SharedPreferencesHelper(getApplication())
+    private var refreshTime = 5 * 60* 1000 * 1000L//5minutes in nanoSecs in var type Long
 
     private val dogsService = DogsApiService()
     //allows us to observe the observable(Single) without having to worry about disposing it,
@@ -34,7 +36,26 @@ class ListViewModel(application: Application): BaseViewModel(application) {
     val loading = MutableLiveData<Boolean>()
 
     fun refresh() {
-        fetchFromRemote()
+        /*
+        logic deciding whether to retrieve from remote Api endPoint or from local db
+        based on the time of retrieval and refreshTime
+        */
+        val updateTime = prefHelper.getUpdateTime()
+        if(updateTime != null && updateTime != 0L && System.nanoTime() - updateTime < refreshTime ) {
+            fetchFromDataBase()
+        } else {
+            fetchFromRemote()
+        }
+    }
+
+    private fun fetchFromDataBase() {
+        loading.value = true
+        //we need a background thread as we are operating the database hence,
+        launch {
+            val dogs = DogDatabase(getApplication()).dogDao().getAllDogs()
+            dogsRetrieved(dogs)
+            Toast.makeText(getApplication(),"Dogs retrieved from database", Toast.LENGTH_SHORT).show()
+        }
     }
 
     //uses Retrofit Service to retrieve data from backEnd Api
@@ -48,16 +69,16 @@ class ListViewModel(application: Application): BaseViewModel(application) {
                 //to display it we need it back on Main Thread instead on BackgroundThread
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object: DisposableSingleObserver<List<DogBreed>>() {
-
                     /*
                     whenever we retrieve the info from a remote end-point
                     1. we store the info locally
                     2. update the UI
                     */
-
                     override fun onSuccess(dogList: List<DogBreed>) {
 
                         storeDogsLocally(dogList)
+
+                        Toast.makeText(getApplication(),"Dogs retrieved from Local Database", Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onError(e: Throwable) {
@@ -72,10 +93,10 @@ class ListViewModel(application: Application): BaseViewModel(application) {
     }
     /*
     we need to store this data in a db with the time of retrieval
-    we also set the lifetime of that stored data so that
-    if we retrieve the data before that lifetime again we can get it from the db(storage)
+    we also set the lifetime(refreshTime) of that stored data so that
+    if we retrieve the data before that lifetime(refreshTime) again we can get it from the db(storage)
     otherwise from the remote Api
-    (this time Of Retrieval can be stored locally using Shared Prefs)
+    this time Of Retrieval can be stored locally using Shared Prefs(saveUpdateTime())
 
     then update the UI
     */
