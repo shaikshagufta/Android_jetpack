@@ -1,15 +1,22 @@
 package com.example.mvvmdogs.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.example.mvvmdogs.model.DogBreed
+import com.example.mvvmdogs.model.DogDatabase
 import com.example.mvvmdogs.model.DogsApiService
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 
-class ListViewModel: ViewModel() {
+/*
+    coroutines are one way to access the db from a separate thread(instead of mainThread) using CoroutineScope
+    to achieve that, we
+    implement some coroutines in a baseClass(BaseViewModel) and extend the ListViewModel from that base class
+*/
+class ListViewModel(application: Application): BaseViewModel(application) {
 
     private val dogsService = DogsApiService()
     //allows us to observe the observable(Single) without having to worry about disposing it,
@@ -38,18 +45,16 @@ class ListViewModel: ViewModel() {
                 //to display it we need it back on Main Thread instead on BackgroundThread
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object: DisposableSingleObserver<List<DogBreed>>() {
-                    // we update our MutableLiveData
+
+                    /*
+                    whenever we retrieve the info from a remote end-point
+                    1. we store the info locally
+                    2. update the UI
+                    */
+
                     override fun onSuccess(dogList: List<DogBreed>) {
-                        //get the list the dogBreed when success
-                        dogs.value = dogList
-                        dogsLoadError.value = false
-                        loading.value = false
-                        /*
-                        we need to store this data in a db with the time of retrieval
-                        we also set the lifetime of that stored data so that
-                        if we retrieve the data before that lifetime again we can get it from the db(storage)
-                        otherwise from the remote Api
-                        */
+
+                        storeDogsLocally(dogList)
                     }
 
                     override fun onError(e: Throwable) {
@@ -61,6 +66,44 @@ class ListViewModel: ViewModel() {
                     }
                 })
         )
+    }
+    /*
+    we need to store this data in a db with the time of retrieval
+    we also set the lifetime of that stored data so that
+    if we retrieve the data before that lifetime again we can get it from the db(storage)
+    otherwise from the remote Api
+    then update the UI
+    */
+
+    // we update our MutableLiveData
+    private fun dogsRetrieved(dogList: List<DogBreed>) {
+        //get the list the dogBreed when success
+        dogs.value = dogList
+        dogsLoadError.value = false
+        loading.value = false
+    }
+
+
+    private fun storeDogsLocally(list: List<DogBreed>) {
+        launch {
+         /* since we have a coroutineScope now after extending this class from the baseClass
+             we can run the code inside this scope on a separate thread
+             so its okay to access the database inside this scope
+         */
+            val dao = DogDatabase(getApplication()).dogDao()
+
+            dao.deleteAllDogs()
+    //we delete all dogs to avoid polluting the database with the previous dog info when we arrive 2nd time
+            val result = dao.insertAll(*list.toTypedArray())//to get the uuids
+    //it gets a list and expands it into individual elements that we can pass to our insertAll() in DogDatabase, there we retrieve a list of uuid of elements
+            //assigning those uuids to the right Dog objects
+            var i = 0//default
+            while (i < list.size) {
+                list[i].uuid = result[i].toInt()//assigning i to the corresponding list element
+                ++i//incrementing i by 1
+            }
+            dogsRetrieved(list)
+        }
     }
 
     // to avoid memory leaks due to observing or waiting for an Observable(Single) when the app is destroyed
