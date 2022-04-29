@@ -1,14 +1,15 @@
 package com.example.mvvmdogs.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import com.example.mvvmdogs.databinding.FragmentDetailBinding
+import com.example.mvvmdogs.util.getProgressDrawable
+import com.example.mvvmdogs.util.loadImage
 import com.example.mvvmdogs.viewmodel.DetailViewModel
 
 class DetailFragment : Fragment() {
@@ -31,14 +32,15 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //instantiating DetailViewModel
-        viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
-        viewModel.fetch()
-
         //retrieving the argument we passed in list-fragment to detail-fragment if its not null
         arguments?.let {
-            dogUuid = DetailFragmentArgs.fromBundle(it).dogUuid
+            dogUuid = DetailFragmentArgs.fromBundle(it).dogUuid//we already have a uuid here unlike DOgsListAdapter
         }
+
+        //instantiating DetailViewModel
+        viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
+        viewModel.fetch(dogUuid)
+
         observeViewModel()
     }
 
@@ -49,6 +51,7 @@ class DetailFragment : Fragment() {
                 binding.dogPurpose.text = dog.bredFor
                 binding.dogTemperament.text = dog.temperament
                 binding.dogLifespan.text = dog.lifeSpan
+                context?.let { binding.dogImage.loadImage(dog.imageUrl, getProgressDrawable(it)) }
             }
         })
     }

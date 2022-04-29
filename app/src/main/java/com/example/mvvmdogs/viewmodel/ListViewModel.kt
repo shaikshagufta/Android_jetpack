@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 class ListViewModel(application: Application): BaseViewModel(application) {
 
     private var prefHelper = SharedPreferencesHelper(getApplication())
-    private var refreshTime = 5 * 60* 1000 * 1000L//5minutes in nanoSecs in var type Long
+    private var refreshTime = 5 * 60 * 1000 * 1000 * 1000L//5minutes in nanoSecs in var type Long
 
     private val dogsService = DogsApiService()
     //allows us to observe the observable(Single) without having to worry about disposing it,

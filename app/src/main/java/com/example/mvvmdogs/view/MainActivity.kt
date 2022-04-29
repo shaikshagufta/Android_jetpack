@@ -14,7 +14,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }*/
 
-    //not working
 
     //1.to add a back button on the tool bar
     private lateinit var navController: NavController
