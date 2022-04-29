@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--
-    1. encapsulate the main layout in the <layout> element
-    2. data, variable definition
-    3. use the var instead of the default text to attach the values
-         directly to the views (separates the business logic from ui/views)
-    4. attach the variable to the layout in the dogs DogsListAdapter
-     -->
 
     <data>
         <variable
