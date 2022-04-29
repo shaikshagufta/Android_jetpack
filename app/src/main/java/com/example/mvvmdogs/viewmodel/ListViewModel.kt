@@ -48,13 +48,19 @@ class ListViewModel(application: Application): BaseViewModel(application) {
         }
     }
 
+    //to get the info from remote end point when we SwipeRefreshLayout instead of local database
+    fun refreshBypassCache() {//fun to byPass/skip the cache(local db)
+        fetchFromRemote()
+    }
+
+
     private fun fetchFromDataBase() {
         loading.value = true
         //we need a background thread as we are operating the database hence,
         launch {
             val dogs = DogDatabase(getApplication()).dogDao().getAllDogs()
             dogsRetrieved(dogs)
-            Toast.makeText(getApplication(),"Dogs retrieved from database", Toast.LENGTH_SHORT).show()
+            Toast.makeText(getApplication(),"Dogs retrieved from Local database", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -78,7 +84,7 @@ class ListViewModel(application: Application): BaseViewModel(application) {
 
                         storeDogsLocally(dogList)
 
-                        Toast.makeText(getApplication(),"Dogs retrieved from Local Database", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(getApplication(),"Dogs retrieved from Remote end Point", Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onError(e: Throwable) {
@@ -112,16 +118,16 @@ class ListViewModel(application: Application): BaseViewModel(application) {
 
     private fun storeDogsLocally(list: List<DogBreed>) {
         launch {
-         /* since we have a coroutineScope now after extending this class from the baseClass
-             we can run the code inside this scope on a separate thread
-             so its okay to access the database inside this scope
-         */
+            /* since we have a coroutineScope now after extending this class from the baseClass
+                we can run the code inside this scope on a separate thread
+                so its okay to access the database inside this scope
+            */
             val dao = DogDatabase(getApplication()).dogDao()
 
             dao.deleteAllDogs()
-    //we delete all dogs to avoid polluting the database with the previous dog info when we arrive 2nd time
+            //we delete all dogs to avoid polluting the database with the previous dog info when we arrive 2nd time
             val result = dao.insertAll(*list.toTypedArray())//to get the uuids
-    //it gets a list and expands it into individual elements that we can pass to our insertAll() in DogDatabase, there we retrieve a list of uuid of elements
+            //it gets a list and expands it into individual elements that we can pass to our insertAll() in DogDatabase, there we retrieve a list of uuid of elements
             //assigning those uuids to the right Dog objects
             var i = 0//default
             while (i < list.size) {
@@ -140,4 +146,3 @@ class ListViewModel(application: Application): BaseViewModel(application) {
         disposable.clear()//to clean up
     }
 }
-

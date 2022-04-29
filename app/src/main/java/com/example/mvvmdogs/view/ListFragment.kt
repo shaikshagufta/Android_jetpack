@@ -24,7 +24,7 @@ class ListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-       binding = FragmentListBinding.inflate(inflater, container, false)
+        binding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -46,7 +46,7 @@ class ListFragment : Fragment() {
             binding.dogsList.visibility = View.GONE
             binding.listError.visibility = View.GONE
             binding.loadingView.visibility = View.VISIBLE
-            viewModel.refresh()
+            viewModel.refreshBypassCache()//to retrieve data from Remote API when we swipeRefresh
             binding.refreshLayout.isRefreshing = false
         }
 
@@ -69,13 +69,13 @@ class ListFragment : Fragment() {
         })
 
         viewModel.loading.observe(viewLifecycleOwner, Observer { isLoading  ->
-           isLoading?.let {
-               binding.loadingView.visibility = if (it) View.VISIBLE else View.GONE
-               if(it) {//i.e, if isLoading
-                 binding.listError.visibility = View.GONE
-                 binding.dogsList.visibility = View.GONE
-               }
-           }
+            isLoading?.let {
+                binding.loadingView.visibility = if (it) View.VISIBLE else View.GONE
+                if(it) {//i.e, if isLoading
+                    binding.listError.visibility = View.GONE
+                    binding.dogsList.visibility = View.GONE
+                }
+            }
         })
     }
 }
