@@ -2,6 +2,7 @@ package com.example.mvvmdogs.util
 
 import android.content.Context
 import android.widget.ImageView
+import androidx.databinding.BindingAdapter
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -26,4 +27,10 @@ fun ImageView.loadImage(uri: String?, progressDrawable: CircularProgressDrawable
         .setDefaultRequestOptions(options)//options those that we created
         .load(uri)//load the uri
         .into(this)//into this view
+}
+@BindingAdapter("android:imageUrl")// name used to access the fn
+//makes the function accessible to databinding class ie, layout with data binding enabled
+fun loadImage(view: ImageView , uri: String?) {
+    //using the ext fun we created to load a url into the imageView
+    view.loadImage(uri, getProgressDrawable(view.context))
 }
