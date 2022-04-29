@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+    1. encapsulate the main layout in the <layout> element
+    2. data, variable definition
+    3. use the var instead of the default text to attach the values
+         directly to the views (separates the business logic from ui/views)
+    4. attach the variable to the layout in the dogs DogsListAdapter
+     -->
 
+    <data>
+        <variable
+            name="dog"
+            type="com.example.mvvmdogs.model.DogBreed" />
+    </data>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -25,13 +37,13 @@
                 style="@style/Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dog Name"/>
+                android:text="@{dog.dogBreed}"/>
             <TextView
                 android:id="@+id/lifeSpan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Text"
-                android:text="Life Span"/>
+                android:text="@{dog.lifeSpan}"/>
         </LinearLayout>
     </LinearLayout>
 </layout>
