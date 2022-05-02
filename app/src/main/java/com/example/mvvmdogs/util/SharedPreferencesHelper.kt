@@ -5,18 +5,6 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 
-/*
-    we need to store this data in a db with the time of retrieval
-    we also set the lifetime of that stored data so that
-    if we retrieve the data before that lifetime again we can get it from the db(storage)
-    otherwise from the remote Api
-    (this time Of Retrieval can be stored locally using Shared Prefs)
-
-    we do so with the help of a separate class to help us access the shared prefs
-     which like DogDatabase() is a Singleton-a pattern of development where we have only one instance of a class;
-
-*/
-
 class SharedPreferencesHelper {
 
     companion object{

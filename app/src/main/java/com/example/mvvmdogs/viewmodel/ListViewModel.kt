@@ -13,17 +13,13 @@ import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.launch
 
-/*
-    coroutines are one way to access the db from a separate thread(instead of mainThread) using CoroutineScope
-    to achieve that, we
-    implement some coroutines in a baseClass(BaseViewModel) and extend the ListViewModel from that base class
-*/
 class ListViewModel(application: Application): BaseViewModel(application) {
 
     private var prefHelper = SharedPreferencesHelper(getApplication())
     private var refreshTime = 5 * 60 * 1000 * 1000 * 1000L//5minutes in nanoSecs in var type Long
 
     private val dogsService = DogsApiService()
+
     //allows us to observe the observable(Single) without having to worry about disposing it,
     // to avoid memory leaks due to observing or waiting for an Observable(Single) when the app is destroyed
     private val disposable = CompositeDisposable()
@@ -36,10 +32,7 @@ class ListViewModel(application: Application): BaseViewModel(application) {
     val loading = MutableLiveData<Boolean>()
 
     fun refresh() {
-        /*
-        logic deciding whether to retrieve from remote Api endPoint or from local db
-        based on the time of retrieval and refreshTime
-        */
+
         val updateTime = prefHelper.getUpdateTime()
         if(updateTime != null && updateTime != 0L && System.nanoTime() - updateTime < refreshTime ) {
             fetchFromDataBase()
@@ -48,8 +41,8 @@ class ListViewModel(application: Application): BaseViewModel(application) {
         }
     }
 
-    //to get the info from remote end point when we SwipeRefreshLayout instead of local database
-    fun refreshBypassCache() {//fun to byPass/skip the cache(local db)
+    //fun to byPass/skip the cache(local db)
+    fun refreshBypassCache() {
         fetchFromRemote()
     }
 
@@ -75,11 +68,7 @@ class ListViewModel(application: Application): BaseViewModel(application) {
                 //to display it we need it back on Main Thread instead on BackgroundThread
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object: DisposableSingleObserver<List<DogBreed>>() {
-                    /*
-                    whenever we retrieve the info from a remote end-point
-                    1. we store the info locally
-                    2. update the UI
-                    */
+
                     override fun onSuccess(dogList: List<DogBreed>) {
 
                         storeDogsLocally(dogList)
@@ -97,15 +86,6 @@ class ListViewModel(application: Application): BaseViewModel(application) {
                 })
         )
     }
-    /*
-    we need to store this data in a db with the time of retrieval
-    we also set the lifetime(refreshTime) of that stored data so that
-    if we retrieve the data before that lifetime(refreshTime) again we can get it from the db(storage)
-    otherwise from the remote Api
-    this time Of Retrieval can be stored locally using Shared Prefs(saveUpdateTime())
-
-    then update the UI
-    */
 
     // we update our MutableLiveData
     private fun dogsRetrieved(dogList: List<DogBreed>) {
@@ -118,14 +98,10 @@ class ListViewModel(application: Application): BaseViewModel(application) {
 
     private fun storeDogsLocally(list: List<DogBreed>) {
         launch {
-            /* since we have a coroutineScope now after extending this class from the baseClass
-                we can run the code inside this scope on a separate thread
-                so its okay to access the database inside this scope
-            */
             val dao = DogDatabase(getApplication()).dogDao()
 
             dao.deleteAllDogs()
-            //we delete all dogs to avoid polluting the database with the previous dog info when we arrive 2nd time
+            //to avoid polluting the database with the previous dog info when we arrive 2nd time
             val result = dao.insertAll(*list.toTypedArray())//to get the uuids
             //it gets a list and expands it into individual elements that we can pass to our insertAll() in DogDatabase, there we retrieve a list of uuid of elements
             //assigning those uuids to the right Dog objects

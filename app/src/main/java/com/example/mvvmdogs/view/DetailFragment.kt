@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.mvvmdogs.databinding.FragmentDetailBinding
 import com.example.mvvmdogs.viewmodel.DetailViewModel
 
-//2.1 setup data binding util like we did in the DogListAdapter(where the layout is created)
 class DetailFragment : Fragment() {
 
     private lateinit var viewModel: DetailViewModel
@@ -19,7 +18,7 @@ class DetailFragment : Fragment() {
 
     private lateinit var binding: FragmentDetailBinding
 
-    override fun onCreateView(//where the layout is created
+    override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
@@ -47,12 +46,6 @@ class DetailFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.dogLiveData.observe(viewLifecycleOwner, Observer { dog ->
             dog?.let {
-                /*binding.dogName.text = dog.dogBreed
-                binding.dogPurpose.text = dog.bredFor
-                binding.dogTemperament.text = dog.temperament
-                binding.dogLifespan.text = dog.lifeSpan
-                context?.let { binding.dogImage.loadImage(dog.imageUrl, getProgressDrawable(it)) }*/
-
                 binding.dog = dog
             }
         })

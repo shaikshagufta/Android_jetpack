@@ -9,12 +9,6 @@ import com.example.mvvmdogs.R
 
 class MainActivity : AppCompatActivity() {
 
-    /*override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }*/
-
-
     //1.to add a back button on the tool bar
     private lateinit var navController: NavController
 
