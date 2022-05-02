@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.mvvmdogs.model.DogBreed
 import com.example.mvvmdogs.model.DogDatabase
 import com.example.mvvmdogs.model.DogsApiService
+import com.example.mvvmdogs.util.NotificationsHelper
 import com.example.mvvmdogs.util.SharedPreferencesHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -74,6 +75,7 @@ class ListViewModel(application: Application): BaseViewModel(application) {
                         storeDogsLocally(dogList)
 
                         Toast.makeText(getApplication(),"Dogs retrieved from Remote end Point", Toast.LENGTH_SHORT).show()
+                        NotificationsHelper(getApplication()).createNotification()//to show the notification
                     }
 
                     override fun onError(e: Throwable) {
