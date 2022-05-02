@@ -4,17 +4,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!--1.add the variables to the layout
-    2.attach the variables to the fragment using binding-->
+    <!--1.create the variables to the layout
+    2. add palette to model
+    3.attach the variables to the fragment_layout
+      "@{palette.color}"
+      binding.palette = myPalette-->
     <data>
         <variable
             name="dog"
             type="com.example.mvvmdogs.model.DogBreed" />
+        <variable
+            name="palette"
+            type="com.example.mvvmdogs.model.DogPalette" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@{palette.color}"
         tools:context=".view.DetailFragment">
 
         <ImageView
