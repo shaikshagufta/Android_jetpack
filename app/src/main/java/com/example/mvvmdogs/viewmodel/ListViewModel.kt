@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 class ListViewModel(application: Application): BaseViewModel(application) {
 
     private var prefHelper = SharedPreferencesHelper(getApplication())
-    private var refreshTime = 5 * 60 * 1000 * 1000 * 1000L//5minutes in nanoSecs in var type Long
+    private var refreshTime = 5 * 60 * 1000 * 1000 * 1000L//we are going to give the user the option to change this time
 
     private val dogsService = DogsApiService()
 

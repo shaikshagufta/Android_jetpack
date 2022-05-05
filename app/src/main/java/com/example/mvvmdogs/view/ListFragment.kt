@@ -23,6 +23,7 @@ class ListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        //setHasOptionsMenu(true)
         // Inflate the layout for this fragment
         binding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
@@ -78,4 +79,5 @@ class ListFragment : Fragment() {
             }
         })
     }
+
 }
