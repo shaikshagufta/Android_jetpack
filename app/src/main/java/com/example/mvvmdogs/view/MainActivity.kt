@@ -1,17 +1,11 @@
 package com.example.mvvmdogs.view
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.mvvmdogs.R
-import com.example.mvvmdogs.util.PERMISSION_SEND_SMS
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,8 +27,10 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(navController, null)
     }
-
-    fun checkSmsPermission() {
+//You don't need to go back to the activity to request permissions anymore.
+// This introduces a dependency from the Fragment to the Activity and limits reusability of the fragment.
+// You can simply call all the permission-related functions straight from the fragment.
+    /*fun checkSmsPermission() {
         //check if we don't have the permission
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             //check if we need to show the permission rationale(why we need the rationale) or if we can simply request the permission
@@ -88,5 +84,5 @@ class MainActivity : AppCompatActivity() {
         if(activeFragment is DetailFragment) {
             ( activeFragment as DetailFragment).onPermissionResult(permissionGranted)
         }
-    }
+    }*/
 }

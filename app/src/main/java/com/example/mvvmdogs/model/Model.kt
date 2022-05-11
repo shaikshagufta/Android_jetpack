@@ -43,5 +43,5 @@ data class DogPalette(var color: Int)
 data class SmsInfo(//to store the info in an object
     var to: String,//destination of the sms ie, number to which the sms is being sent
     var text: String,//text of the sms
-    var imageUrl: String//will come from dogImage
+    var imageUrl: String?//will come from dogImage
 )
