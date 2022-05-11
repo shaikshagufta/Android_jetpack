@@ -1,10 +1,13 @@
 package com.example.mvvmdogs.view
 
 import android.Manifest
+import android.app.PendingIntent
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.checkSelfPermission
@@ -215,6 +218,9 @@ class DetailFragment : Fragment() {
     }
 
     private fun sendSms(smsInfo: SmsInfo) {
-
+        val intent = Intent(context, MainActivity::class.java)
+        val pi = PendingIntent.getActivity(context, 0, intent,0)
+        val smsManager = context?.getSystemService(SmsManager::class.java)
+        smsManager?.sendTextMessage(smsInfo.to, null, smsInfo.text, pi, null)
     }
 }
