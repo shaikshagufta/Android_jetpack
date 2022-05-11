@@ -84,6 +84,14 @@ class DetailFragment : Fragment() {
                         true
                     }
                     R.id.action_share -> {
+                        //generic share that can be passed on to email, fb,twitter etc \
+                        val intent = Intent(Intent.ACTION_SEND)
+                        intent.type = "text/plain"
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Check out this dog breed")
+                        intent.putExtra(Intent.EXTRA_TEXT, "${currentDog?.dogBreed} bred for ${currentDog?.bredFor}")
+                        intent.putExtra(Intent.EXTRA_STREAM, currentDog?.imageUrl)//the recipient app may take or disregard it.
+                        startActivity(Intent.createChooser(intent, "Share with"))//to allow the apps that can handle the intent to be able to take this info
+                        //chooser is the endUser, we pop up a dialog that lets the user choose which app should handle this sharing functionality
                         true
                     }
                     else -> onMenuItemSelected(menuItem)
