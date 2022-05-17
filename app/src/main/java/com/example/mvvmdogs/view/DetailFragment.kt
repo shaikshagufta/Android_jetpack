@@ -16,7 +16,6 @@ import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
@@ -28,9 +27,9 @@ import com.example.mvvmdogs.databinding.SendSmsDialogBinding
 import com.example.mvvmdogs.model.DogBreed
 import com.example.mvvmdogs.model.DogPalette
 import com.example.mvvmdogs.model.SmsInfo
+import com.example.mvvmdogs.util.PERMISSION_SEND_SMS
 import com.example.mvvmdogs.viewmodel.DetailViewModel
 
-private const val PERMISSION_SEND_SMS_REQUEST = 1
 
 class DetailFragment : Fragment() {
 
@@ -54,8 +53,8 @@ class DetailFragment : Fragment() {
     ): View {
         //setHasOptionsMenu(true) //deprecated
         // Inflate the layout for this fragment
-        binding = FragmentDetailBinding.inflate(inflater, container, false)
-        //binding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail, container, false)//can be either way
+        //binding = FragmentDetailBinding.inflate(inflater, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail, container, false)//can be either way
         return binding.root
     }
 
@@ -77,6 +76,7 @@ class DetailFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
+
                     R.id.action_send_sms -> {
                         sendSmsStarted = true//start the process of sending sms
                         //call a method on activity to ask for the permission(SMS) .The fragment cant do it
@@ -107,23 +107,23 @@ class DetailFragment : Fragment() {
         }
 
         //instantiating DetailViewModel
-        viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
+        viewModel = ViewModelProvider(this)[DetailViewModel::class.java]
         viewModel.fetch(dogUuid)
 
         observeViewModel()
     }
 
     private fun observeViewModel() {
-        viewModel.dogLiveData.observe(viewLifecycleOwner, Observer { dog ->
+        viewModel.dogLiveData.observe(viewLifecycleOwner) { dog ->
             currentDog = dog//to maintain the info about the dog we are working ith
-            dog?.let {
+            dog?.let { it ->
                 binding.dog = dog
 
                 it.imageUrl?.let {
                     setupBackgroundColor(it)
                 }
             }
-        })
+        }
     }
 
     private fun setupBackgroundColor(url: String) {
@@ -132,7 +132,7 @@ class DetailFragment : Fragment() {
             .asBitmap()
             .load(url)
             .into(object : CustomTarget<Bitmap>() {
-
+                override fun onLoadCleared(placeholder: Drawable?) {}
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                   Palette.from(resource)
                       .generate { palette ->
@@ -141,9 +141,6 @@ class DetailFragment : Fragment() {
                           binding.palette = myPalette
                       }
                 }
-
-                override fun onLoadCleared(placeholder: Drawable?) {}
-
             })//custom object used to access the image
     }
 
@@ -156,10 +153,10 @@ class DetailFragment : Fragment() {
                 AlertDialog.Builder(requireContext())
                     .setTitle("Send SMS permission")
                     .setMessage("This app requires access to send an SMS")
-                    .setPositiveButton("Ask me") { dialog, which ->
+                    .setPositiveButton("Ask me") { _, _ ->
                         requestSmsPermission()
                     }
-                    .setNegativeButton("No") { dialog, which ->
+                    .setNegativeButton("No") { _, _ ->
                         onPermissionResult(false)
                     }
                     .show()
@@ -172,7 +169,10 @@ class DetailFragment : Fragment() {
     }
 
     private fun requestSmsPermission() {
-        requestPermissions(arrayOf(Manifest.permission.SEND_SMS), PERMISSION_SEND_SMS_REQUEST)
+        requestPermissions(arrayOf(Manifest.permission.SEND_SMS),
+            //request code that we defined in Util class
+            PERMISSION_SEND_SMS
+        )
     }
 
     override fun onRequestPermissionsResult(
@@ -181,7 +181,7 @@ class DetailFragment : Fragment() {
         grantResults: IntArray
     ) {
         when(requestCode) {
-            PERMISSION_SEND_SMS_REQUEST -> {
+            PERMISSION_SEND_SMS -> {
                 if(grantResults.isNotEmpty() && grantResults.first() == PackageManager.PERMISSION_GRANTED) {
                     onPermissionResult(true)
                 } else {
@@ -212,13 +212,13 @@ class DetailFragment : Fragment() {
 
                 AlertDialog.Builder(it)
                     .setView(dialogBinding.root)
-                    .setPositiveButton("Send SMS") { dialog, which ->
+                    .setPositiveButton("Send SMS") { _, _ ->
                         if (!dialogBinding.smsDestination.text.isNullOrBlank()) {
                             smsInfo.to = dialogBinding.smsDestination.text.toString()
                             sendSms(smsInfo)
                         }
                     }
-                    .setNegativeButton("Cancel") { dialog ,which -> }
+                    .setNegativeButton("Cancel") { _, _ -> }
                     .show()
                 dialogBinding.smsInfo = smsInfo
             }
